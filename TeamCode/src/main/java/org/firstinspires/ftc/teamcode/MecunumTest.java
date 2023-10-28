@@ -35,7 +35,9 @@ public class MecunumTest extends LinearOpMode
 
             double max = Math.max(Math.abs(leftX) + Math.abs(leftY) + Math.abs(rightX), 1);
 
-            leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
+            rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
+            rightBack.setDirection(DcMotorSimple.Direction.REVERSE);
+            leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
 
             leftFront.setPower((drive + strafe + twist) / max);
             rightFront.setPower((drive - strafe - twist) / max);
@@ -64,7 +66,7 @@ public class MecunumTest extends LinearOpMode
 
             if (gamepad2.right_bumper)
             {
-                claw.setPower(1);
+                claw.setPower(1 / 2);
             }
             else if (gamepad2.right_trigger > 0.8)
             {
@@ -78,7 +80,7 @@ public class MecunumTest extends LinearOpMode
             // Control arm speed
             if (gamepad2.left_stick_y != 0.0)
             {
-                arm.setPower(gamepad2.left_stick_y / 2);
+                arm.setPower(gamepad2.left_stick_y / 3);
             }
         }
     }
