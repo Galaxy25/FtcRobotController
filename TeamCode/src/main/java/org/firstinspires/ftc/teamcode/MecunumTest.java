@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.Servo;
 
 @TeleOp(name = "MecanumTest")
 public class MecunumTest extends LinearOpMode
@@ -11,36 +12,47 @@ public class MecunumTest extends LinearOpMode
     @Override
     public void runOpMode()
     {
-        DcMotorSimple leftFront = hardwareMap.get(DcMotorSimple.class, "leftFront");
-        DcMotorSimple leftBack = hardwareMap.get(DcMotorSimple.class, "leftBack");
-        DcMotorSimple rightFront = hardwareMap.get(DcMotorSimple.class, "rightFront");
-        DcMotorSimple rightBack = hardwareMap.get(DcMotorSimple.class, "rightBack");
+        double servoPos = 0.5;
+        DcMotorSimple leftFront = hardwareMap.get(DcMotorSimple.class, "frontLeft");
+        DcMotorSimple leftBack = hardwareMap.get(DcMotorSimple.class, "backLeft");
+        DcMotorSimple rightFront = hardwareMap.get(DcMotorSimple.class, "frontRight");
+        DcMotorSimple rightBack = hardwareMap.get(DcMotorSimple.class, "backRight");
 
-        leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
+        Servo clawR = hardwareMap.get(Servo.class, "clawR");
+
+        rightBack.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
 
         waitForStart();
 
-        while (opModeIsActive())
-        {
+        while (opModeIsActive()) {
             double leftY = gamepad1.left_stick_y;
-            double leftX = gamepad1.left_stick_x;
-            double rightX = gamepad1.right_stick_x;
+            double leftX = -gamepad1.left_stick_x;
+            double rightX = -gamepad1.right_stick_x;
 
             double drive = leftY;
-            double strafe = leftX;
+            double strafe = leftX * 1.1;
             double twist = rightX;
 
             double max = Math.max(Math.abs(leftX) + Math.abs(leftY) + Math.abs(rightX), 1);
-            
-            rightBack.setDirection(DcMotorSimple.Direction.REVERSE);
-            leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
 
             leftFront.setPower((drive + strafe + twist) / max);
             rightFront.setPower((drive - strafe - twist) / max);
             leftBack.setPower((drive - strafe + twist) / max);
             rightBack.setPower((drive + strafe - twist) / max);
-            telemetry.addData("Left Trigger: ", gamepad2.left_trigger);
-            telemetry.addData("Right Trigger: ", gamepad2.right_trigger);
+
+            if (gamepad1.left_bumper)
+            {
+                servoPos -= 0.001;
+            }
+            if (gamepad1.right_bumper)
+            {
+                servoPos += 0.001;
+            }
+            clawR.setPosition(servoPos);
+
+            telemetry.addData("Servo Position: ", servoPos);
+
             telemetry.update();
         }
     }
